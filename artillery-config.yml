@@ -1,0 +1,9 @@
+config:
+  target: 'http://localhost:3005'
+  phases:
+    - duration: 1
+      arrivalRate: 2
+scenarios:
+  - flow:
+      - post:
+          url: "/amqp/random"

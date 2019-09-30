@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    hostname: "rabbit"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq"
+    volumes:
+      - ./rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+
+  producer:
+    build:
+      context: ./producer-service
+      dockerfile: Dockerfile
+    volumes:
+      - './producer-service:/app'
+    ports:
+      - '3005:3000'
+    depends_on:
+      - rabbitmq
+    environment:
+      - QUEUE_URL=amqp://guest:guest@rabbitmq
+      - QUEUE_NAME=test_queue
+      - MAX_MATRIX_SIZE=30
+      - MIN_MATRIX_SIZE=5
+
+  consumer:
+    build:
+      context: ./consumer-service
+      dockerfile: Dockerfile
+    volumes:
+      - './consumer-service:/app'
+    depends_on:
+      - rabbitmq
+    environment:
+      - QUEUE_URL=amqp://guest:guest@rabbitmq
+      - QUEUE_NAME=test_queue
